@@ -47,6 +47,8 @@ public class MyListsTests extends CoreTestCase {
         MyListPageObject.swipeByArticleToDelete(search_line);
         MyListPageObject.waitForArticleToDisappearByTitle(search_line);
     }
+
+    //Ex17
     @Test
     public void testSavingTwoArticles() throws InterruptedException {
         String search_line = "Kingdom";
