@@ -8,7 +8,7 @@ import tests.*;
 @Suite.SuiteClasses({
         ChangeAppConditionTests.class,
         ArticleTests.class,
-        MyListsTests.class,
+        //MyListsTests.class,
         SearchTests.class
 })
 

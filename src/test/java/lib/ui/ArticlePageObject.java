@@ -1,6 +1,7 @@
 package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebElement;
 import lib.Platform;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -24,14 +25,18 @@ abstract public class ArticlePageObject extends MainPageObject {
         super(driver);
     }
 
+    @Step("Waiting for title on the article page")
     public WebElement waitForTitleElement(){
         return this.waitForElementPresent(TITLE, "Cannot find article title on page", 20);
     }
+    @Step("Getting folder locator by name of folder")
     private static String getFolderXpathByName(String name_of_folder){
         return FOLDER_BY_NAME_TPL.replace("{FOLDER_NAME}", name_of_folder);
     }
+    @Step("Getting title of article")
     public String getArticleTitle(){
         WebElement title_element = waitForTitleElement();
+        screenshot(this.takeScreenshot("article_title"));
         if (Platform.getInstance().isIOS()){
             return title_element.getAttribute("name");
         } else if (Platform.getInstance().isAndroid()) {
@@ -40,6 +45,7 @@ abstract public class ArticlePageObject extends MainPageObject {
             return title_element.getText();
         }
     }
+    @Step("Swiping to footer on article page")
     public void swipeToFooter(){
         if (Platform.getInstance().isAndroid()){
             this.swipeUpToFindElement(FOOTER_ELEMENT, "Cannot find the end of article", 20);
@@ -52,10 +58,13 @@ abstract public class ArticlePageObject extends MainPageObject {
                     20
             );
         }
+        screenshot(this.takeScreenshot("footer"));
     }
+    @Step("Swiping quick to footer")
     public void swipeQuickToFooter(){
         this.swipeUpToFindElementQuick(FOOTER_ELEMENT, "Cannot find the end of article", 20);
     }
+    @Step("Adding article to my new list by name of folder")
     public void addArticleToMyNewList(String name_of_folder){
         this.waitForElementPresentAndClick(
                 OPTIONS_BUTTON,
@@ -78,12 +87,13 @@ abstract public class ArticlePageObject extends MainPageObject {
                 "Cannot put text into articles folder input",
                 name_of_folder
         );
+        screenshot(this.takeScreenshot("new_list"));
         this.waitForElementPresentAndClick(
                 LIST_OK_BUTTON,
                 "Cannot press OK button"
         );
     }
-
+    @Step("Adding article for my list that is already exist")
     public void addArticleToMyList(String name_of_folder){
         this.waitForElementPresentAndClick(
                 OPTIONS_BUTTON,
@@ -100,9 +110,10 @@ abstract public class ArticlePageObject extends MainPageObject {
                 10
         );
     }
-
+    @Step("Closing article")
     public void closeArticle(){
         if ((Platform.getInstance().isIOS()) || (Platform.getInstance().isAndroid())){
+            screenshot(this.takeScreenshot("article_for_close"));
             this.waitForElementPresentAndClick(
                     CLOSE_ARTICLE_BUTTON,
                     "Cannot close article, cannot find X or back button",
@@ -112,13 +123,14 @@ abstract public class ArticlePageObject extends MainPageObject {
             System.out.println("Method closeArticle do nothing");
         }
     }
+    @Step("Adding article to my saved")
     public void addArticleToMySaved(){
         if (Platform.getInstance().isMW()){
             this.removeArticleFromSavedIfItAdded();
         }
         tryClickElementWithFewAttempts(OPTIONS_ADD_TO_LIST_BUTTON, "Cannot find button to add article to saved", 10);
     }
-
+    @Step("Removing article from saved if it added")
     public void removeArticleFromSavedIfItAdded(){
         if (this.isElementPresent(OPTIONS_REMOVE_FROM_MY_LIST_BUTTON)){
             this.waitForElementPresentAndClick(
@@ -131,6 +143,7 @@ abstract public class ArticlePageObject extends MainPageObject {
                     "Cannot find button to add an article to saved list after removing it from this list before"
             );
         }
+        screenshot(this.takeScreenshot("article"));
     }
 }
 

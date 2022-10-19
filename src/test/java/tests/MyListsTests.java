@@ -1,5 +1,7 @@
 package tests;
 
+import io.qameta.allure.*;
+import io.qameta.allure.junit4.DisplayName;
 import lib.ui.*;
 import org.junit.Test;
 import lib.CoreTestCase;
@@ -9,10 +11,16 @@ import lib.ui.factories.MyListsPageObjectFactory;
 import lib.ui.factories.NavigationUIFactory;
 import lib.ui.factories.SearchPageObjectFactory;
 
+@Epic("Tests for saved articles to list")
 public class MyListsTests extends CoreTestCase {
     private static final String login = "Ksuharik2000";
     private static final String password = "Ksuharik2000!";
     //@Test
+    @Features(value = {@Feature(value="Search"), @Feature(value="Article"), @Feature(value="My lists")})
+    @DisplayName("Save one article to my list")
+    @Description("Search article, open it, add to saved, go to my lists, delete article from my list")
+    @Step("Starting testSaveFirstArticleToMyList")
+    @Severity(value = SeverityLevel.MINOR)
     public void testSaveFirstArticleToMyList() {
         String search_line = "Kingdom";
         String substring = "Video game series";
@@ -50,6 +58,11 @@ public class MyListsTests extends CoreTestCase {
 
     //Ex17
     @Test
+    @Features(value = {@Feature(value="Search"), @Feature(value="Article"), @Feature(value="My lists")})
+    @DisplayName("Save two articles to my list")
+    @Description("Search article, open it, add to saved, authorization for mobile web, search second article, open it< add to saved, go to my lists, delete one article from my list")
+    @Step("Starting testSavingTwoArticles")
+    @Severity(value = SeverityLevel.MINOR)
     public void testSavingTwoArticles() throws InterruptedException {
         String search_line = "Kingdom";
         String substring = "Video game series";

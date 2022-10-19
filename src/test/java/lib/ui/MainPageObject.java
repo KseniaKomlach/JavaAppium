@@ -4,17 +4,21 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Step;
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.taskdefs.Java;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import lib.Platform;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -101,7 +105,7 @@ public class MainPageObject {
                     org.junit.Assert.assertTrue("At least one title does not contain '" + word + "'", title.getAttribute("text").contains(word));
                 });
     }
-
+    @Step("Scrolling web page up (only for mobile web)")
     public void scrollWebPageUp(){
         if (Platform.getInstance().isMW()){
             JavascriptExecutor JSExecutor = (JavascriptExecutor) driver;
@@ -123,7 +127,7 @@ public class MainPageObject {
             }
         }
     }
-
+    @Step("Swiping up")
     public void swipeUp(int timeOfSwipe) {
         if (driver instanceof AppiumDriver) {
             TouchAction action = new TouchAction((AppiumDriver) driver);
@@ -141,7 +145,7 @@ public class MainPageObject {
             System.out.println("Method swipeUp(int timeOfSwipe) does nothing for platform " + Platform.getInstance().getPlatformVar());
         }
     }
-
+    @Step("Swiping up to find element by locator '{locator}', max swipes = '{max_swipes}'")
     public void swipeUpToFindElement(String locator, String error_message, int max_swipes) {
         By by =  this.getLocatorByString(locator);
         int already_swiped = 0;
@@ -154,7 +158,7 @@ public class MainPageObject {
             ++already_swiped;
         }
     }
-
+    @Step("Swiping up till element appear")
     public void swipeUpTillElementAppear(String locator, String error_message, int max_swipes){
         int already_swiped = 0;
         while (!this.isElementLocatedOnTheScreen(locator)){
@@ -165,7 +169,7 @@ public class MainPageObject {
             ++already_swiped;
         }
     }
-
+    @Step("Is element located on the screen")
     public boolean isElementLocatedOnTheScreen(String locator){
         int element_location_by_y = this.waitForElementPresent(locator, "Cannot find element by locator", 1)
                 .getLocation().getY();
@@ -177,7 +181,7 @@ public class MainPageObject {
         int screen_size_by_y = driver.manage().window().getSize().getHeight();
         return element_location_by_y < screen_size_by_y;
     }
-
+    @Step("Swiping quick to find element by locator '{locator}'")
     public void swipeUpToFindElementQuick(String locator, String error_message, int max_swipes) {
         By by =  this.getLocatorByString(locator);
         int already_swiped = 0;
@@ -191,7 +195,7 @@ public class MainPageObject {
             ++already_swiped;
         }
     }
-
+    @Step("Swiping element to left for delete")
     public void swipeElementToLeft(String locator, String error_message) {
         if (driver instanceof AppiumDriver) {
             WebElement element = waitForElementPresent(locator, error_message, 10);
@@ -215,6 +219,7 @@ public class MainPageObject {
             System.out.println("Method swipeElementToLeft() does nothing for platform " + Platform.getInstance().getPlatformVar());
         }
     }
+    @Step("Clicking element to the right upper corner")
     public void clickElementToTheRightUpperCorner(){
         this.waitForElementPresentAndClick(
                 "xpath://XCUIElementTypeButton[contains(@name,'swipe action delete')]",
@@ -222,14 +227,17 @@ public class MainPageObject {
                 10
         );
     }
+    @Step("Getting amount of elements by locator '{locator}'")
     public int getAmountOfElements(String locator){
         By by =  this.getLocatorByString(locator);
         List elements = driver.findElements(by);
         return elements.size();
     }
+    @Step("Checking that element with locator '{locator}' is present")
     public boolean isElementPresent(String locator){
         return getAmountOfElements(locator) > 0;
     }
+    @Step("Try click element with few attempts by locator '{locator}'")
     public void tryClickElementWithFewAttempts(String locator, String error_message, int amount_of_attempts){
         int current_attempts = 0;
         boolean need_more_attempts = true;
@@ -245,6 +253,7 @@ public class MainPageObject {
         }
         ++current_attempts;
     }
+    @Step("Make sure that elment with locator '{locator} is not present'")
     public void assertElementNotPresent(String locator, String error_message){
         int amount_of_elements = getAmountOfElements(locator);
         if (amount_of_elements>0){
@@ -256,6 +265,7 @@ public class MainPageObject {
         WebElement element = waitForElementPresent(locator, error_message, timeoutInSeconds);
         return element.getAttribute(attribute);
     }
+    @Step("Make sure that element with locator '{locator} is present'")
     public void assertElementPresent(String locator, String error_message){
         int amount_of_elements = getAmountOfElements(locator);
         if (amount_of_elements==0){
@@ -263,7 +273,7 @@ public class MainPageObject {
             throw new AssertionError(default_message + ". " + error_message);
         }
     }
-
+    @Step("Getting locator by type '{locator_with_type}'")
     private By getLocatorByString(String locator_with_type){
         String[] exploded_locator = locator_with_type.split(Pattern.quote(":"), 2);
         String by_type = exploded_locator[0];
@@ -278,5 +288,29 @@ public class MainPageObject {
         } else {
             throw new IllegalArgumentException("Cannot get typ of locator. Locator: " + locator_with_type);
         }
+    }
+
+    @Step("Taking screenshot with name '{name}'")
+    public String takeScreenshot(String name){
+        File source = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        String path = System.getProperty("user.dir")+ "/" +name+ "_screenshot.png";
+        System.out.println(System.getProperty("user.dir"));
+        try {
+            FileUtils.copyFile(source, new File(path));
+            System.out.println("The screenshot was taken: "+path);
+        } catch (Exception e){
+            System.out.println("Cannot take screenshot. Error: "+e.getMessage());
+        }
+        return path;
+    }
+    @Attachment
+    public static byte[] screenshot(String path){
+        byte[] bytes = new byte[0];
+        try {
+            bytes = Files.readAllBytes(Paths.get(path));
+        } catch (IOException e){
+            System.out.println("Cannot get bytes from screenshot. Error: " + e.getMessage());
+        }
+        return bytes;
     }
 }

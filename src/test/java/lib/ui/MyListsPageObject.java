@@ -1,6 +1,7 @@
 package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Step;
 import lib.Platform;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -23,6 +24,7 @@ abstract public class MyListsPageObject extends MainPageObject{
         return REMOVE_FROM_SAVED_BUTTON.replace("{TITLE}", article_title);
     }
 
+    @Step("Opening folder by name '{name_of_folder}'")
     public void openFolderByName(String name_of_folder){
         String folder_name_xpath = getFolderXpathByName(name_of_folder);
         this.waitForElementPresentAndClick(
@@ -31,6 +33,7 @@ abstract public class MyListsPageObject extends MainPageObject{
                 10
         );
     }
+    @Step("Swiping article for delete by name '{name_of_article}'")
     public void swipeByArticleToDelete(String name_of_article){
         String article_title = getArticleXpathByTitle(name_of_article);
         if ((Platform.getInstance().isIOS()) || (Platform.getInstance().isAndroid())){
@@ -53,6 +56,7 @@ abstract public class MyListsPageObject extends MainPageObject{
             driver.navigate().refresh();
         }
     }
+    @Step("Waiting article to disappear by its title '{article_title}'")
     public void waitForArticleToDisappearByTitle(String article_title){
         String article_xpath = getArticleXpathByTitle(article_title);
         this.waitForElementNotPresent(
@@ -61,6 +65,7 @@ abstract public class MyListsPageObject extends MainPageObject{
                 10
         );
     }
+    @Step("Waiting article to appear by its title '{article_title}'")
     public void waitForArticleToAppearByTitle(String article_title){
         String article_xpath = getArticleXpathByTitle(article_title);
         this.waitForElementPresent(
@@ -69,7 +74,9 @@ abstract public class MyListsPageObject extends MainPageObject{
                 10
         );
     }
+    @Step("Closing pop up window (only for ios)")
     public void closePopUpWindow(){
+        screenshot(this.takeScreenshot("pop_up"));
         this.waitForElementPresentAndClick(
                 "xpath://XCUIElementTypeButton[@name='Close']",
                 "Cannot find close button",
